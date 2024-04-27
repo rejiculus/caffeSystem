@@ -4,6 +4,8 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class Order implements Comparable<Order>{
+    private static Long count=0L;
+    private Long id;
     private Map<Product,Integer> items;
     private double cost;
     private Time time;
@@ -13,7 +15,7 @@ public class Order implements Comparable<Order>{
     public Order(){
         this.items = new TreeMap<>();
         this.cost=0.0;
-        state=OrderState.Compiled;
+        this.state=OrderState.Compiled;
     }
     private void calcCost(){
         cost=0.0;
@@ -59,8 +61,10 @@ public class Order implements Comparable<Order>{
     public void makeOrder(){
         this.time=new Time(System.currentTimeMillis());
         this.state=OrderState.InProgress;
+        this.id = count;
+        count++;
     }
-    public void orderCookComplite(){
+    public void orderCookComplete(){
         if(delivery!=null)
             state=OrderState.Delivery;
         else
@@ -70,8 +74,11 @@ public class Order implements Comparable<Order>{
         state=OrderState.Complete;
     }
 
+    public boolean contains(Product product){
+        return items.containsKey(product);
+    }
 
-
+    //getters
     public OrderState getState(){
         return this.state;
     }
@@ -87,11 +94,14 @@ public class Order implements Comparable<Order>{
     public boolean isCanChange() {
         return state==OrderState.Compiled;
     }
-
+    public Long getId(){
+        return this.id;
+    }
     public OrderDelivery getDelivery() {
         return delivery;
     }
 
+    //setters
     public void setDelivery(OrderDelivery delivery) {
         if(state.equals(OrderState.Compiled))
             this.delivery = delivery;
@@ -101,11 +111,11 @@ public class Order implements Comparable<Order>{
             this.delivery = new OrderDelivery(table);
     }
 
+    //
     @Override
     public int compareTo(Order order) {
         return time.compareTo(order.getTime());
     }
-
     @Override
     public int hashCode(){
         return time.hashCode();
