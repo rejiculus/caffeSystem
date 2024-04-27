@@ -7,23 +7,24 @@ public class Order implements Comparable<Order>{
     private Map<Product,Integer> items;
     private double cost;
     private Time time;
-    private boolean canChange;
     private OrderState state;
     private OrderDelivery delivery;
 
     public Order(){
         this.items = new TreeMap<>();
         this.cost=0.0;
-        canChange=true;
         state=OrderState.Compiled;
     }
     private void calcCost(){
+        cost=0.0;
         items.keySet().stream().map(item->items.get(item)*item.getCost()).forEach(c->cost+=c);
     }
+
+    // add elements //
     public void addItem(Product product){
         if(state!=OrderState.Compiled) return;
 
-        if(items.containsKey(product))
+        if(!items.isEmpty() && items.containsKey(product))
             items.put(product,items.get(product)+1);
         else
             items.put(product,1);
@@ -39,6 +40,7 @@ public class Order implements Comparable<Order>{
             items.put(product,count);
         calcCost();
     }
+    // del elements //
     public void deleteItem(Product product){
         if(state!=OrderState.Compiled || !items.containsKey(product)) return;// todo throw
         items.remove(product);
@@ -54,6 +56,25 @@ public class Order implements Comparable<Order>{
         calcCost();
     }
 
+    public void makeOrder(){
+        this.time=new Time(System.currentTimeMillis());
+        this.state=OrderState.InProgress;
+    }
+    public void orderCookComplite(){
+        if(delivery!=null)
+            state=OrderState.Delivery;
+        else
+            state=OrderState.Ready;
+    }
+    public void orderClose(){
+        state=OrderState.Complete;
+    }
+
+
+
+    public OrderState getState(){
+        return this.state;
+    }
     public Map<Product,Integer> getItems(){
         return items;//fixme
     }
@@ -63,15 +84,21 @@ public class Order implements Comparable<Order>{
     public Time getTime(){
         return time;
     }
-
     public boolean isCanChange() {
         return state==OrderState.Compiled;
     }
 
-    public void makeOrder(){
-        this.time=new Time(System.currentTimeMillis());
-        this.canChange=false;
-        this.state=OrderState.InProgress;
+    public OrderDelivery getDelivery() {
+        return delivery;
+    }
+
+    public void setDelivery(OrderDelivery delivery) {
+        if(state.equals(OrderState.Compiled))
+            this.delivery = delivery;
+    }
+    public void setDelivery(int table) {
+        if(state.equals(OrderState.Compiled))
+            this.delivery = new OrderDelivery(table);
     }
 
     @Override
@@ -91,7 +118,7 @@ public class Order implements Comparable<Order>{
         return items.equals(or.getItems()) &&
                 this.cost == or.getCost() &&
                 this.time == or.getTime() &&
-                this.canChange == or.isCanChange();
+                this.state.equals(or.state);
     }
     @Override
     public String toString(){
@@ -102,7 +129,7 @@ public class Order implements Comparable<Order>{
                                 .collect(Collectors.joining(", "))+"}, "+
                 "cost: "+this.cost+", "+
                 "time: "+this.time+", "+
-                "can change: "+this.canChange+"}";
+                "state: "+this.state+"}";
     }
 
 }
