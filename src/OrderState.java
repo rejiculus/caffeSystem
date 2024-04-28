@@ -1,6 +1,6 @@
 public enum OrderState {
-    InProgress,
     Compiled,
+    InProgress,
     Delivery,
     Ready,
     Complete

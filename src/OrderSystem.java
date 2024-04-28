@@ -35,9 +35,11 @@ public class OrderSystem {
 
 
     public void createOrder(){
+        if(br==null) throw new RuntimeException("Input stream was closed!");//?
+
         Order o = new Order();
         String name="";
-        Product p=null;
+        Product p;
         try {
             while (!name.equals("-1")) {
                 showShoppingBasket(o);
@@ -49,9 +51,10 @@ public class OrderSystem {
                 if (name.equals("exit") || name.equals("Exit") || name.equals("-1"))
                     break;
 
-                p = ProductRepository.getByName(name);
+                p = ProductRepository.getProductByName(name);
                 if (p == null)
                     continue;
+                //
                 System.out.println("How many?(defaul=1)");
                 name =br.readLine();
                 int c=0;
@@ -63,18 +66,19 @@ public class OrderSystem {
                     o.addItem(p);
                 reservedProducts.put(p,c);
             }
+
             while (!o.getItems().isEmpty()) {
-                showDeliveryPlaces();
+                showDeliveryPlaces();//fixme check free tables in set
 
                 name = br.readLine();
 
                 if (name.equals("exit") || name.equals("Exit") || name.equals("-1"))
                     break;
 
-                if (name.equals("1")) {
-                    o.setDelivery(freeTables.remove(0));
+                if (name.equals("1") && hasFreeTables()) {
+                    o.setDelivery(getFreeTable());
                     break;
-                } else if(name.equals("2"))
+                } else if(name.equals("2") || !hasFreeTables())
                     break;
             }
             o.makeOrder();
@@ -114,8 +118,13 @@ public class OrderSystem {
     }
 
 
-
-    //add
+    private boolean hasFreeTables(){
+        return !freeTables.isEmpty();
+    }
+    private int getFreeTable(){
+        return freeTables.remove(0);
+    }
+    // add
     private void addProduct(Product product){
         addProduct(product,1);
     }
@@ -132,7 +141,7 @@ public class OrderSystem {
 
         reservedProducts.put(product,count);
     }
-
+    // delete
     private void deleteProduct(Order order, Product product){
         deleteProduct(order,product,1);
     }
@@ -151,6 +160,7 @@ public class OrderSystem {
             count+=stock.get(product);
         stock.put(product,count);
     }
+
     // show
     private void showMenu() {
         System.out.println("Menu:");
@@ -164,14 +174,17 @@ public class OrderSystem {
         System.out.println("Products: ");
         o.getItems().keySet().stream()
                 .map(Product::getName)
-                .forEach(x->System.out.printf(" %s - %d\n",x,(o.getItems().get(ProductRepository.getByName(x))) ));
+                .forEach(x->System.out.printf(" %s - %d\n",x,(o.getItems().get(ProductRepository.getProductByName(x))) ));
         System.out.println("Cost: "+o.getCost());
         System.out.println();
         System.out.println();
     }
     private void showDeliveryPlaces()
     {
-        System.out.println("Were you want to eat? Here or toGo?[1,2]");
+        if(hasFreeTables())
+            System.out.println("Were you want to eat? Here or toGo?[1,2]");
+        else
+            System.out.println("We have no free tables? (Enter)");
     }
     private void showDeliveryPlace(Order o){
         if(o.getDelivery()==null)
