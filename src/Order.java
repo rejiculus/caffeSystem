@@ -4,11 +4,16 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class Order implements Comparable<Order> {
+    /*
+    todo возможно стоит сделать этот класс наследником коллекции
+     */
     private static Long count = 0L;
     private Long id;
     private Map<Product, Integer> items;
     private double cost;
     private Time time;
+    private Time preparedTime;
+    private Time deliveredTime;
     private OrderState state;
     private OrderDelivery delivery;
     private boolean canToGo;
@@ -92,6 +97,7 @@ public class Order implements Comparable<Order> {
     }
 
     public void orderCookComplete() {
+        preparedTime=new Time(System.currentTimeMillis());
         if (delivery != null)
             state = OrderState.Delivery;
         else
@@ -99,6 +105,7 @@ public class Order implements Comparable<Order> {
     }
 
     public void orderClose() {
+        deliveredTime=new Time(System.currentTimeMillis());
         state = OrderState.Complete;
     }
 
@@ -138,6 +145,18 @@ public class Order implements Comparable<Order> {
 
     public OrderDelivery getDelivery() {
         return delivery;
+    }
+
+    public Time getPreparedTime() {
+        return preparedTime;
+    }
+
+    public Time getDeliveredTime() {
+        return deliveredTime;
+    }
+
+    public boolean isCanToGo() {
+        return canToGo;
     }
 
     //setters
