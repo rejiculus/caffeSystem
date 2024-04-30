@@ -3,35 +3,37 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-public class OrderSystem {
+public class OrderSystem extends Thread{
+    private PreparingSystem preparingSystem;
+    private BufferedReader br;
+    private boolean isWorkTime;
+    private ArrayList<Order> orders;//link to Monitor orders
+
     private List<Integer> freeTables;
-    private PriorityQueue<Order> orders;
     private HashMap<Product, Integer> reservedProducts;
     private Map<Product,Integer> stock;
     private PriorityQueue<Order> ordersDelivery;
     private List<Order> history;
-    private BufferedReader br;
 
-    public OrderSystem(){
+    {
         freeTables=new ArrayList<>();
-        orders=new PriorityQueue<>();
         ordersDelivery=new PriorityQueue<>();
-        br = new BufferedReader(new InputStreamReader(System.in));
         history=new ArrayList<>();
         reservedProducts=new HashMap<>();
         stock=ProductRepository.getAll();
-
         for(int i=0;i<CaffeParams.TABLE_COUNT;i++){
             freeTables.add(i);
         }
     }
 
-    public void run(){
-        createOrder();
-        createOrder();
-        cooking();
-        delivery();
+    public OrderSystem(PreparingSystem preparingSystem,ArrayList<Order> orders){
+        this.br = new BufferedReader(new InputStreamReader(System.in));
+        this.isWorkTime = true;
+        this.preparingSystem = preparingSystem;
+        this.orders=orders;
     }
+
+
 
 
     public void createOrder(){
@@ -82,7 +84,9 @@ public class OrderSystem {
                     break;
             }
             o.makeOrder();
+            preparingSystem.put(o);
             orders.add(o);
+
             showOrderId(o);
             showDeliveryPlace(o);
         }catch (IOException e){
@@ -93,13 +97,13 @@ public class OrderSystem {
     }
 
     public void cooking(){
-        while(!orders.isEmpty()){
-            Order o = orders.poll();
-            //wait
-            o.orderCookComplete();
-            System.out.println(o.getTime());
-            ordersDelivery.add(o);
-        }
+//        while(!orders.isEmpty()){
+//            Order o = orders.poll();
+//            //wait
+//            o.orderCookComplete();
+//            System.out.println(o.getTime());
+//            ordersDelivery.add(o);
+//        }
     }
     public void delivery(){
         while(!ordersDelivery.isEmpty()) {
@@ -202,6 +206,19 @@ public class OrderSystem {
                 br.close();
         } catch(IOException e){
             System.out.println(e);
+        }
+
+    }
+
+    @Override
+    public synchronized void start() {
+        super.start();
+    }
+
+    @Override
+    public void run(){
+        while(isWorkTime){
+            createOrder();
         }
 
     }
