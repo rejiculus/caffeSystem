@@ -1,11 +1,14 @@
+package models;
 import java.util.Objects;
+import params.CaffeParams;
 
 public class OrderDelivery {
     private int tableNumber;
-    OrderDelivery(int table){
-        if(table<0||table>CaffeParams.TABLE_COUNT)
+
+    OrderDelivery(int table) {
+        if (table < 0 || table > CaffeParams.TABLE_COUNT)
             throw new RuntimeException("Incorrect table");
-        tableNumber=table;
+        tableNumber = table;
     }
 
     public int getTableNumber() {
@@ -13,6 +16,8 @@ public class OrderDelivery {
     }
 
     public void setTableNumber(int tableNumber) {
+        if (tableNumber < 0 || tableNumber > CaffeParams.TABLE_COUNT)
+            throw new RuntimeException("Incorrect table");
         this.tableNumber = tableNumber;
     }
 

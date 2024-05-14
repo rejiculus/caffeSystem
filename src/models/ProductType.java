@@ -1,3 +1,4 @@
+package models;
 public enum ProductType {
     DRINK,
     HOT_FOOD,
