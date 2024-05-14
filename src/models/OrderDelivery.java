@@ -1,4 +1,6 @@
+package models;
 import java.util.Objects;
+import params.CaffeParams;
 
 public class OrderDelivery {
     private int tableNumber;

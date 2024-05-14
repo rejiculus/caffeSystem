@@ -1,3 +1,4 @@
+package models;
 public class Product implements Cloneable, Comparable<Product> {
     private String name;
     private ProductType type;

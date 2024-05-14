@@ -1,12 +1,18 @@
+package models;
 import java.sql.Time;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import models.OrderDelivery;
+import common_exceptions.ContainsException;
+import common_exceptions.LessThanZeroException;
+import common_exceptions.NullParamException;
+import common_exceptions.OrderException;
 
 public class Order implements Comparable<Order> {
     /*
     todo возможно стоит сделать этот класс наследником коллекции
-     */
+    */
     private static Long count = 0L;
     private Long id;
     private Map<Product, Integer> items;
@@ -21,7 +27,7 @@ public class Order implements Comparable<Order> {
     public Order() {
         this.items = new TreeMap<>();
         this.cost = 0.0;
-        this.state = OrderState.Compiled;
+        this.state = OrderState.COMPILED;
         this.canToGo=true;
     }
 
@@ -32,11 +38,11 @@ public class Order implements Comparable<Order> {
     }
 
     public void addItem(Product product, int count) {
-        if (product == null) throw new RuntimeException("You can't put null in parameters! Order-" + this.id);
-        if (state != OrderState.Compiled)
-            throw new RuntimeException(String.format("Order %d is not Compiled state now.(%s)", this.id, this.state));
+        if (product == null) throw new NullParamException(this.id);
+        if (state != OrderState.COMPILED)
+            throw new OrderException(this.id, OrderState.COMPILED, this.state);
         if (count < 1)
-            throw new RuntimeException("You can't add count of product less than one! Order-" + this.id);// todo throw
+            throw new LessThanZeroException(this.id);
 
         if (items.containsKey(product))
             items.put(product, items.get(product) + count);
@@ -49,11 +55,11 @@ public class Order implements Comparable<Order> {
 
     // del elements //
     public void deleteItem(Product product) {
-        if (product == null) throw new RuntimeException("You can't put null in parameters! Order-" + this.id);
-        if (state != OrderState.Compiled)
-            throw new RuntimeException(String.format("Order %d is not 'Compiled' state now.(%s)", this.id, this.state));
+        if (product == null) throw new NullParamException(this.id);
+        if (state != OrderState.COMPILED)
+            throw new OrderException(this.id, OrderState.COMPILED, this.state);
         if (!items.containsKey(product))
-            throw new RuntimeException(String.format("Order %d is not contain %s!", this.id, product.getName()));
+            throw new ContainsException(this.id, product.getName());
 
         items.remove(product);
         canToGo = items.keySet()
@@ -64,15 +70,15 @@ public class Order implements Comparable<Order> {
     }
 
     public void deleteItem(Product product, int count) {
-        if (product == null) throw new RuntimeException("You can't put null in parameters! Order-" + this.id);
-        if (state != OrderState.Compiled)
-            throw new RuntimeException(String.format("Order %d is not Compiled state now.(%s)", this.id, this.state));
+        if (product == null) throw new NullParamException(this.id);
+        if (state != OrderState.COMPILED)
+            throw new OrderException(this.id, OrderState.COMPILED, this.state);
         if (count < 1)
-            throw new RuntimeException("You can't delete count of product less than one! Order-" + this.id);// todo throw
+            throw new LessThanZeroException(this.id);
         if (!items.containsKey(product))
-            throw new RuntimeException(String.format("Order %d is not contain %s!", this.id, product.getName()));
+            throw new ContainsException(this.id, product.getName());
         if (items.get(product) < count)
-            throw new RuntimeException(String.format("Order %d contain %s less then %d!", this.id, product.getName(), count));
+            throw new ContainsException(this.id, product.getName(), count);
 
         if(count== items.get(product)){
             deleteItem(product);
@@ -91,7 +97,7 @@ public class Order implements Comparable<Order> {
     // order state methods
     public void makeOrder() {
         this.time = new Time(System.currentTimeMillis());
-        this.state = OrderState.InProgress;
+        this.state = OrderState.IN_PROGRESS;
         this.id = count;
         count++;
     }
@@ -99,14 +105,14 @@ public class Order implements Comparable<Order> {
     public void orderCookComplete() {
         preparedTime=new Time(System.currentTimeMillis());
         if (delivery != null)
-            state = OrderState.Delivery;
+            state = OrderState.DELIVERE;
         else
-            state = OrderState.Ready;
+            state = OrderState.READY;
     }
 
     public void orderClose() {
         deliveredTime=new Time(System.currentTimeMillis());
-        state = OrderState.Complete;
+        state = OrderState.COMPLETE;
     }
 
     //
@@ -136,7 +142,7 @@ public class Order implements Comparable<Order> {
     }
 
     public boolean isCanChange() {
-        return state == OrderState.Compiled;
+        return state == OrderState.COMPILED;
     }
 
     public Long getId() {
@@ -161,12 +167,12 @@ public class Order implements Comparable<Order> {
 
     //setters
     public void setDelivery(OrderDelivery delivery) {
-        if (state.equals(OrderState.Compiled))
+        if (state.equals(OrderState.COMPILED))
             this.delivery = delivery;
     }
 
     public void setDelivery(int table) {
-        if (state.equals(OrderState.Compiled))
+        if (state.equals(OrderState.COMPILED))
             this.delivery = new OrderDelivery(table);
     }
 
