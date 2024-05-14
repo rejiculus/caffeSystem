@@ -2,6 +2,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import models.Product;
+import models.ProductType;
 
 public class ProductRepository {
     private static TreeMap<Product,Integer> products;

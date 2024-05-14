@@ -1,7 +1,12 @@
+package controllers;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
+import ProductRepository;
+import models.Order;
+import models.Product;
+import params.CaffeParams;
 
 public class OrderSystem extends Thread{
     private PreparingSystem preparingSystem;

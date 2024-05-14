@@ -1,4 +1,6 @@
+package controllers;
 import java.util.PriorityQueue;
+import models.Order;
 
 public class PreparingSystem extends Thread {
     private PriorityQueue<Order> orders;

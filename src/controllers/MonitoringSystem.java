@@ -1,5 +1,7 @@
+package controllers;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
+import models.Order;
 
 public class MonitoringSystem extends Thread{
     private ArrayList<Order> orders;
