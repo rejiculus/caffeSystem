@@ -1,7 +1,7 @@
+package controllers;
+
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import models.Product;
 import models.ProductType;
 
@@ -18,10 +18,10 @@ public class ProductRepository {
 
     }
     public static Map<Product,Integer> getAll(){
-        return products;
+        return Map.copyOf(products);
     }
 
-    public static Product getByName(String name){
+    public static Product getProductByName(String name){
         for(Product p:products.keySet()){
             if(name.equals(p.getName()))
                 return p;

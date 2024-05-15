@@ -1,4 +1,7 @@
 package models;
+
+import common_exceptions.NullParamException;
+
 public class Product implements Cloneable, Comparable<Product> {
     private String name;
     private ProductType type;
@@ -6,7 +9,7 @@ public class Product implements Cloneable, Comparable<Product> {
     private boolean isToGo;
 
     public Product(String name, ProductType type, double cost, boolean isToGo) {
-        if (name == null || type == null) throw new RuntimeException("Cant be null");
+        if (name == null || type == null) throw new NullParamException();
         this.name = name;
         this.type = type;
         this.cost = cost;
@@ -37,7 +40,7 @@ public class Product implements Cloneable, Comparable<Product> {
 
     @Override
     public Product clone() {
-        return new Product(name, type, cost, isToGo);
+        return new Product(this.name, this.type, this.cost, this.isToGo);
     }
 
     @Override
