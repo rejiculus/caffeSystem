@@ -1,5 +1,7 @@
 package models;
+
 import java.util.Objects;
+import common_exceptions.TableException;
 import params.CaffeParams;
 
 public class OrderDelivery {
@@ -7,7 +9,7 @@ public class OrderDelivery {
 
     OrderDelivery(int table) {
         if (table < 0 || table > CaffeParams.TABLE_COUNT)
-            throw new RuntimeException("Incorrect table");
+            throw new TableException();
         tableNumber = table;
     }
 
@@ -17,14 +19,16 @@ public class OrderDelivery {
 
     public void setTableNumber(int tableNumber) {
         if (tableNumber < 0 || tableNumber > CaffeParams.TABLE_COUNT)
-            throw new RuntimeException("Incorrect table");
+            throw new TableException();
         this.tableNumber = tableNumber;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         OrderDelivery that = (OrderDelivery) o;
         return tableNumber == that.tableNumber;
     }
