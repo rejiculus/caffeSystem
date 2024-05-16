@@ -1,18 +1,31 @@
 package controllers;
 
-import java.util.ArrayList;
-import java.util.PriorityQueue;
+import java.util.List;
 import models.Order;
+import models.OrderState;
+import params.CaffeParams;
 
 public class MonitoringSystem extends Thread{
-    private ArrayList<Order> orders;
-    private OrderSystem orderSystem;
-    private PreparingSystem preparingSystem;
-    private DeliverySystem deliverySystem;
+    private List<Order> orders;
+    private MainSystem mainSystem;
 
-    public MonitoringSystem(){
-        deliverySystem=new DeliverySystem();
-        preparingSystem=new PreparingSystem(deliverySystem);
-        orderSystem=new OrderSystem(preparingSystem,orders);
+    public MonitoringSystem(MainSystem mainSystem, List<Order> orders){
+        this.orders=orders;
+        this.mainSystem=mainSystem;
+    }
+
+    @Override
+    public void run(){
+        while(CaffeParams.isRun){
+            orders.stream()
+                .filter(order-> order.getState().equals(OrderState.COMPLETE))
+                .forEach(System.out::println);
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    System.out.println(e);
+                }
+        }
     }
 }

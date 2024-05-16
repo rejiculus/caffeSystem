@@ -36,7 +36,7 @@ public class StockSystem {
 
         reserved.put(product, count);
     }
-    public void deleteProduct(Order order, Product product);
+    //public void deleteProduct(Order order, Product product);
     public void deleteProduct(Order order, Product product, Integer count){
 
         if (!reserved.containsKey(product) || reserved.get(product) < count)

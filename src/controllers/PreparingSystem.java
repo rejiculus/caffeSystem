@@ -1,6 +1,7 @@
 package controllers;
 
 import java.util.PriorityQueue;
+import java.util.Queue;
 import models.Order;
 
 public class PreparingSystem extends Thread {
@@ -8,7 +9,7 @@ public class PreparingSystem extends Thread {
     private static boolean isWorkTime;
     private DeliverySystem delivery;
 
-    public PreparingSystem(DeliverySystem delivery) {
+    public PreparingSystem(MainSystem mainSystem, Queue<Order> preparingOrders) {
         this.delivery = delivery;
         this.orders=new PriorityQueue<>();
         isWorkTime=true;
