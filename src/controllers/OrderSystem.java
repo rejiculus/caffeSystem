@@ -25,33 +25,20 @@ public class OrderSystem extends Thread {
 
 
 
-    private PreparingSystem preparingSystem;
     private BufferedReader br;
 
-    private List<Integer> freeTables;
-    private PriorityQueue<Order> ordersDelivery;
-    private List<Order> history;
 
-    {
-        freeTables = new ArrayList<>();
-        ordersDelivery = new PriorityQueue<>();
-        history = new ArrayList<>();
-        for (int i = 0; i < CaffeParams.TABLE_COUNT; i++) {
-            freeTables.add(i);
-        }
-    }
-
-    public OrderSystem(PreparingSystem preparingSystem, List<Order> orders) {
-        this.br = new BufferedReader(new InputStreamReader(System.in));
+    public OrderSystem(MainSystem ms, StockSystem ss) {
+        this.mainSystem = ms;
+        this.stockSystem = ss;
         this.isWorkTime = true;
-        this.preparingSystem = preparingSystem;
         helper = UserIOHelper.getInstance();
     }
 
 
 
     public void createOrder() {
-        if (br == null)
+        if (helper == null)
             throw new RuntimeException("Input stream was closed!");// ?
 
         Order o = new Order();
@@ -74,10 +61,8 @@ public class OrderSystem extends Thread {
             int c = 0;
             if (!name.isEmpty())
                 c = Integer.parseInt(name);
-            if (c != 0)
-                o.addItem(p, c);
-            else
-                o.addItem(p);
+            if (c < 1) continue; //FIXME Какой в этом смысл
+            o.addItem(p, c);
             
             stockSystem.reserveProduct(o, p, c);
         }
@@ -87,34 +72,20 @@ public class OrderSystem extends Thread {
             name = helper.input(showDeliveryPlaces()); // fixme check free tables in set
 
             if (name.equals("exit") || name.equals("Exit") || name.equals("-1"))
-                break;
+                break;//fixme выход в никуда (баг)
 
-            if (name.equals("1") && hasFreeTables()) {
-                o.setDelivery(getFreeTable());
+            if (name.equals("1") && mainSystem.hasFreeTables()) {
+                o.setDelivery(mainSystem.getFreeTable());
                 break;
-            } else if (name.equals("2") || !hasFreeTables())
+            } else if (name.equals("2") || !mainSystem.hasFreeTables())
                 break;
         }
         o.makeOrder();
         mainSystem.orderToPreparing(o);
         helper.out(showOrderId(o) + showDeliveryPlace(o));
 
-
     }
 
-
-    public List<Order> getHistory() {
-        return List.copyOf(this.history);
-    }
-
-
-    private boolean hasFreeTables() {
-        return !freeTables.isEmpty();
-    }
-
-    private int getFreeTable() {
-        return freeTables.remove(0);
-    }
 
     // add
     private void addProduct(Order o, Product product) {
@@ -134,7 +105,7 @@ public class OrderSystem extends Thread {
 
     // delete
     private void deleteProduct(Order order, Product product) {
-        deleteProduct(order, product, 1);
+        deleteProduct(order, product, 1);//todo change to delete product from list 
     }
 
     private void deleteProduct(Order order, Product product, int count) {
@@ -175,7 +146,7 @@ public class OrderSystem extends Thread {
 
     private String showDeliveryPlaces() {
 
-        if (hasFreeTables())
+        if (mainSystem.hasFreeTables())
             return "Were you want to eat? Here or toGo?[1,2]";
         else
             return "We have no free tables? (Enter)";
@@ -194,13 +165,8 @@ public class OrderSystem extends Thread {
     }
 
     public void close() {
-        try {
-            if (br.ready())
-                br.close();
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-
+        if (helper!=null)
+            helper.close();
     }
 
     @Override
