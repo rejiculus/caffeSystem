@@ -33,5 +33,14 @@ public class UserIOHelper {
     public void out(String message){
         System.out.print(message);
     }
+    public void close(){
+        try {
+            if(br!=null && br.ready())
+                br.close();
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+            
+    }
 
 }

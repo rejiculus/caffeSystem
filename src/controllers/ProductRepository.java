@@ -7,16 +7,22 @@ import models.ProductType;
 
 public class ProductRepository {
     private static TreeMap<Product,Integer> products;
+    private static ProductRepository instance;
 
-    static {
+    private ProductRepository(){
         products=new TreeMap<>();
         products.put(new Product("soup",ProductType.HOT_FOOD,100.0,false),10);
         products.put(new Product("tea",ProductType.HOT_DRINK,50.0,true),10);
         products.put(new Product("coffee",ProductType.HOT_DRINK,150.0,true),10);
         products.put(new Product("cake",ProductType.FOOD,300.0,true),10);
         products.put(new Product("sidr",ProductType.ALCOHOL,200.0,true),10);
-
     }
+    public static ProductRepository getInstance(){
+        if(instance==null)
+            instance=new ProductRepository();
+        return instance;
+    }
+
     public static Map<Product,Integer> getAll(){
         return Map.copyOf(products);
     }

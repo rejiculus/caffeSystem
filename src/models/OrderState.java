@@ -2,7 +2,7 @@ package models;
 public enum OrderState {
     COMPILED,
     IN_PROGRESS,
-    DELIVERE,
+    DELIVERY,
     READY,
     COMPLETE
 }

@@ -106,7 +106,7 @@ public class Order implements Comparable<Order> {
     public void orderCookComplete() {
         preparedTime = new Time(System.currentTimeMillis());
         if (delivery != null)
-            state = OrderState.DELIVERE;
+            state = OrderState.DELIVERY;
         else
             state = OrderState.READY;
     }
