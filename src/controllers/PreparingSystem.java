@@ -3,25 +3,28 @@ package controllers;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import models.Order;
+import params.CaffeParams;
 
 public class PreparingSystem extends Thread {
-    private PriorityQueue<Order> orders;
+    private Queue<Order> orders;
     private static boolean isWorkTime;
     private DeliverySystem delivery;
+    private MainSystem mainSystem;
 
     public PreparingSystem(MainSystem mainSystem, Queue<Order> preparingOrders) {
-        this.delivery = delivery;
-        this.orders=new PriorityQueue<>();
-        isWorkTime=true;
+        this.mainSystem = mainSystem;
+        this.orders = preparingOrders;
+        isWorkTime = true;
     }
 
-    public void run(){
-        try{
-            while(isWorkTime){
-                if(!orders.isEmpty()){
+    public void run() {
+        try {
+            while (CaffeParams.isRun) {
+                if (!orders.isEmpty()) {
                     Order o = orders.poll();
-                    wait(1000);
-
+                    sleep(o.getItems().size() * 5000);
+                    o.orderCookComplete();
+                    mainSystem.orderToDelivery(o);
                 }
             }
         } catch (InterruptedException e) {
@@ -29,15 +32,18 @@ public class PreparingSystem extends Thread {
         }
 
     }
-    public void put(Order o){
-        if(o==null) throw new RuntimeException("Null");
+
+    public void put(Order o) {
+        if (o == null)
+            throw new RuntimeException("Null");
         orders.add(o);
     }
 
-    public void turnOn(){
-        isWorkTime=true;
+    public void turnOn() {
+        isWorkTime = true;
     }
-    public void turnOff(){
-        isWorkTime=false;
+
+    public void turnOff() {
+        isWorkTime = false;
     }
 }
