@@ -24,7 +24,7 @@ public class ProductRepository {
     }
 
     public static Map<Product,Integer> getAll(){
-        return Map.copyOf(products);
+        return new TreeMap<>(products);
     }
 
     public static Product getProductByName(String name){

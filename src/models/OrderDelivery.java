@@ -4,6 +4,8 @@ import java.util.Objects;
 import common_exceptions.TableException;
 import params.CaffeParams;
 
+//imutable
+
 public class OrderDelivery {
     private int tableNumber;
 
@@ -17,11 +19,11 @@ public class OrderDelivery {
         return tableNumber;
     }
 
-    public void setTableNumber(int tableNumber) {
-        if (tableNumber < 0 || tableNumber > CaffeParams.TABLE_COUNT)
-            throw new TableException();
-        this.tableNumber = tableNumber;
-    }
+    // public void setTableNumber(int tableNumber) {
+    //     if (tableNumber < 0 || tableNumber > CaffeParams.TABLE_COUNT)
+    //         throw new TableException();
+    //     this.tableNumber = tableNumber;
+    // }
 
     @Override
     public boolean equals(Object o) {

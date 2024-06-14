@@ -1,9 +1,6 @@
 package controllers;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.*;
 import common_exceptions.ContainsException;
 import common_exceptions.LessThanZeroException;
 import common_exceptions.NullParamException;
@@ -17,17 +14,6 @@ public class OrderSystem extends Thread {
     private boolean isWorkTime;
     private UserIOHelper helper;
 
-
-
-
-
-
-
-
-
-    private BufferedReader br;
-
-
     public OrderSystem(MainSystem ms, StockSystem ss) {
         this.mainSystem = ms;
         this.stockSystem = ss;
@@ -35,20 +21,15 @@ public class OrderSystem extends Thread {
         helper = UserIOHelper.getInstance();
     }
 
-
-
     public void createOrder() {
         if (helper == null)
-            throw new RuntimeException("Input stream was closed!");// ?
+            throw new RuntimeException("Input stream is close!");// ?
 
         Order o = new Order();
         String name = "";
         Product p;
         while (!name.equals("-1")) {
-
-
             name = helper.input(showShoppingBasket(o) + showMenu());
-
 
             if (name.equals("exit") || name.equals("Exit") || name.equals("-1"))
                 break;
@@ -61,9 +42,10 @@ public class OrderSystem extends Thread {
             int c = 0;
             if (!name.isEmpty())
                 c = Integer.parseInt(name);
-            if (c < 1) continue; //FIXME Какой в этом смысл
+            if (c < 1)
+                continue; // FIXME Какой в этом смысл
             o.addItem(p, c);
-            
+
             stockSystem.reserveProduct(o, p, c);
         }
 
@@ -72,7 +54,7 @@ public class OrderSystem extends Thread {
             name = helper.input(showDeliveryPlaces()); // fixme check free tables in set
 
             if (name.equals("exit") || name.equals("Exit") || name.equals("-1"))
-                break;//fixme выход в никуда (баг)
+                break;// fixme выход в никуда (баг)
 
             if (name.equals("1") && mainSystem.hasFreeTables()) {
                 o.setDelivery(mainSystem.getFreeTable());
@@ -85,7 +67,6 @@ public class OrderSystem extends Thread {
         helper.out(showOrderId(o) + showDeliveryPlace(o));
 
     }
-
 
     // add
     private void addProduct(Order o, Product product) {
@@ -105,7 +86,7 @@ public class OrderSystem extends Thread {
 
     // delete
     private void deleteProduct(Order order, Product product) {
-        deleteProduct(order, product, 1);//todo change to delete product from list 
+        deleteProduct(order, product, 1);// todo change to delete product from list
     }
 
     private void deleteProduct(Order order, Product product, int count) {
@@ -119,7 +100,7 @@ public class OrderSystem extends Thread {
             throw new ContainsException(order.getId(), product.getName(), count);
 
         order.deleteItem(product, count);
-        stockSystem.deleteProduct(order,product,count);
+        stockSystem.deleteProduct(order, product, count);
     }
 
     // show
@@ -165,7 +146,7 @@ public class OrderSystem extends Thread {
     }
 
     public void close() {
-        if (helper!=null)
+        if (helper != null)
             helper.close();
     }
 
@@ -176,7 +157,7 @@ public class OrderSystem extends Thread {
 
     @Override
     public void run() {
-        while (isWorkTime) {
+        while (CaffeParams.isRun) {
             createOrder();
         }
 
