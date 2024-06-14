@@ -10,9 +10,6 @@ import common_exceptions.NullParamException;
 import common_exceptions.OrderException;
 
 public class Order implements Comparable<Order> {
-    /*
-     * todo возможно стоит сделать этот класс наследником коллекции
-     */
     private static Long orderCount = 0L;
     private Long id;
     private Map<Product, Integer> items;
@@ -128,8 +125,12 @@ public class Order implements Comparable<Order> {
         return this.state;
     }
 
+    /** 
+     * produts:count
+     * @return return copy of products map
+     */
     public Map<Product, Integer> getItems() {
-        return items;// fixme
+        return Map.copyOf(items);
     }
 
     public double getCost() {
@@ -137,9 +138,8 @@ public class Order implements Comparable<Order> {
     }
 
     public Time getTime() {
-        return time;
+        return new Time(time.getTime());
     }
-
     public boolean isCanChange() {
         return state == OrderState.COMPILED;
     }
@@ -153,11 +153,11 @@ public class Order implements Comparable<Order> {
     }
 
     public Time getPreparedTime() {
-        return preparedTime;
+        return new Time(preparedTime.getTime());
     }
 
     public Time getDeliveredTime() {
-        return deliveredTime;
+        return new Time(deliveredTime.getTime());
     }
 
     public boolean isCanToGo() {
